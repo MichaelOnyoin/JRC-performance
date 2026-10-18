@@ -9,6 +9,7 @@ import Profile from'./pages/Profile';
 import Signup from'./pages/Signup';
 import{useEffect,useState}from'react';
 import{api}from'./api';
+import MyKpis from'./pages/MyKpis';
 
 const Guard=({children})=>localStorage.getItem('token')?children:<Navigate to="/login" replace/>;
 function Home(){const[route,setRoute]=useState('');useEffect(()=>{api('/api/auth/me').then(user=>setRoute(user.role==='Employee'?'/profile':'/dashboard')).catch(()=>setRoute('/login'))},[]);return route?<Navigate to={route} replace/>:null}
@@ -19,6 +20,7 @@ export default function App()
            <Route index element={<Home/>}/>
            <Route path="dashboard" element={<Dashboard/>}/>
            <Route path="profile" element={<Profile/>}/>
+           <Route path="my-kpis" element={<MyKpis/>}/>
            <Route path="entries" element={<Entries/>}/>
            <Route path="employees" element={<Employees/>}/>
            <Route path="admin" element={<Admin/>}/></Route>

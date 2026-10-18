@@ -12,11 +12,11 @@ export default function Layout()
     <button className="ghost" onClick={()=>{localStorage.clear();nav('/login')}}>Sign out</button>
     </header>
     <div className="shell"><aside>
-        {user?.role==='Employee'?<NavLink to="/profile">My Profile</NavLink>:<NavLink to="/dashboard">Partner Dashboard</NavLink>}
+        {user?.role==='Employee'?<><NavLink to="/profile">My Profile</NavLink><NavLink to="/my-kpis">My KPI actuals</NavLink></>:<NavLink to="/dashboard">Partner Dashboard</NavLink>}
         {user?.role!=='Employee'&&<>
         <NavLink to="/entries">KPI Entries</NavLink>
         <NavLink to="/employees">Employees</NavLink>
-        <NavLink to="/admin">Administration</NavLink>
+        {(user?.role==='Admin'||user?.role==='Partner')&&<NavLink to="/admin">Administration</NavLink>}
         </>}
         </aside>
         <main>
