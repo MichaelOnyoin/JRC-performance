@@ -22,9 +22,9 @@ export default function Profile(){
                         <CartesianGrid strokeDasharray="3 3" stroke="#dce5ee"/>
                         <XAxis dataKey="month" tickFormatter={value=>new Date(`${value}T00:00:00`).toLocaleDateString(undefined,{month:'short',year:'2-digit'})}/>
                         <YAxis yAxisId="score" stroke="#003b70"/><YAxis yAxisId="actual" orientation="right" stroke="#d71920"/>
-                        <Tooltip labelFormatter={value=>new Date(`${value}T00:00:00`).toLocaleDateString(undefined,{month:'long',year:'numeric'})} formatter={(value,name)=>[number(value),name==='total_score'?'Total score':'Actual sum']}/>
+                        <Tooltip labelFormatter={value=>new Date(`${value}T00:00:00`).toLocaleDateString(undefined,{month:'long',year:'numeric'})} formatter={(value,name)=>[number(value),name==='total_score'?'Total score':'Score']}/>
                         <Line yAxisId="score" type="monotone" dataKey="total_score" name="Total score" stroke="#003b70" strokeWidth={3} dot={{r:4}} connectNulls/>
-                        <Line yAxisId="actual" type="monotone" dataKey="actual_sum" name="Actual sum" stroke="#d71920" strokeWidth={3} dot={{r:4}} connectNulls/>
+                        {/* <Line yAxisId="actual" type="monotone" dataKey="actual_sum" name="Actual sum" stroke="#d71920" strokeWidth={3} dot={{r:4}} connectNulls/> */}
                     </LineChart>
                 </ResponsiveContainer>:<p>No performance has been recorded for your account yet.</p>}
             </div>

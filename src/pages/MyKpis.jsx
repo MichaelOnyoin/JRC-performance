@@ -5,6 +5,7 @@ import Status from'../components/Status';
 const currentMonth=()=>{const now=new Date();return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`};
 export default function MyKpis(){
     const[month,setMonth]=useState(currentMonth),[rows,setRows]=useState([]),[error,setError]=useState(''),[loading,setLoading]=useState(false),[busy,setBusy]=useState(null);
+    const totalScore=rows.reduce((total,row)=>total+(Number(row.final_score)||0),0);
     async function load(){setLoading(true);setError('');try{setRows(await api(`/api/my/entries?month=${month}`))}catch(e){setError(e.message)}finally{setLoading(false)}}
     useEffect(()=>{load()},[month]);
     function update(id,changes){setRows(old=>old.map(row=>row.id===id?{...row,...changes}:row))}
@@ -36,14 +37,21 @@ export default function MyKpis(){
                     </div>
                     <div className="kpi-attachment"><div><b>Proof document</b><p>{row.has_context?row.context_filename:'Attach a supporting document (10 MB maximum).'}</p></div><div className="actions">
                         {row.has_context&&<><button className="secondary" type="button" onClick={()=>download(row)}>Download</button>{editable&&<button type="button" disabled={isBusy} onClick={()=>removeAttachment(row)}>Remove</button>}</>}
-                        {editable&&<label className="file-picker"><span>{row.has_context?'Replace document':'Choose document'}</span><input type="file" accept=".pdf,.docx,.xlsx,.txt,.csv,.png,.jpg,.jpeg" disabled={isBusy} onChange={e=>{attach(row,e.target.files?.[0]);e.target.value=''}}/></label>}
+                        {editable&&<label className="file-picker"><span>{row.has_context?'Replace document':'Choose document'}</span><input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.png,.jpg,.jpeg" disabled={isBusy} onChange={e=>{attach(row,e.target.files?.[0]);e.target.value=''}}/></label>}
                     </div></div>
-                    <div className="my-kpi-footer"><div className="kpi-score">{row.final_score!=null?<>Calculated score: <b>{Number(row.final_score).toFixed(2)}</b> · {Number(row.performance_pct||0).toFixed(1)}% of target</>:<>Score is calculated when you save an actual.</>}</div>
+                    <div className="my-kpi-footer">
+                        <div className="kpi-score">
+                            {
+                             row.final_score!=null?
+                             <>Calculated score: 
+                             <b>{Number(row.final_score).toFixed(2)}</b> · {Number(row.performance_pct||0).toFixed(1)}% of target</>:
+                             <>Score is calculated when you save an actual.</>}</div>
                         {editable&&<div className="actions"><button className="secondary" disabled={isBusy} onClick={()=>save(row)}>{isBusy?'Saving…':'Save draft'}</button><button disabled={isBusy||row.actual===''||row.actual==null} onClick={()=>submit(row)}>Submit for review</button></div>}
                     </div>
                     {row.status==='Rejected'&&row.supervisor_comments&&<div className="review-note"><b>Reviewer feedback</b><p>{row.supervisor_comments}</p></div>}
                 </article>
             })}</div>
         }
+        {!loading&&rows.length>0&&<div className="monthly-score-total"><span>Sum of scores for this month</span><b>{totalScore.toFixed(2)}</b></div>}
     </section>
 }
