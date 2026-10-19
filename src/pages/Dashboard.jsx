@@ -1,7 +1,15 @@
-import{useEffect,useState}from'react';import{api}from'../api';
-import{BarChart,Bar,LineChart,Line,XAxis,YAxis,Tooltip,ResponsiveContainer,CartesianGrid}from'recharts';
+import {useEffect, useState} from 'react';
+import {api}from'../api';
+import {BarChart,Bar,LineChart,Line,XAxis,YAxis,Tooltip,ResponsiveContainer,CartesianGrid} from 'recharts';
+const canonicalTeam=team=>{
+    const normalized=String(team||'').trim().toLowerCase().replace(/\s+/g,' ');
+    if(normalized==='hlb jim roberts')return 'HLB Jim Roberts';
+    if(normalized==='jim roberts consulting')return 'Jim Roberts Consulting';
+    return String(team||'Unassigned').trim()||'Unassigned';
+};
 export default function Dashboard(){
-    const[month,setMonth]=useState(new Date().toISOString().slice(0,7)+'-01'),[data,setData]=useState(null),[employees,setEmployees]=useState([]),[employeeId,setEmployeeId]=useState(''),[trend,setTrend]=useState(null),[error,setError]=useState('');
+    const[month,setMonth]=useState(new Date().toISOString().slice(0,7)+'-01'),[data,setData]=useState(null),[employees,setEmployees]=useState([]),[employeeId,setEmployeeId]=useState(''),[trend,setTrend]=useState(null),[error,setError]=useState(''),[teamFilter,setTeamFilter]=useState('All');
+    const scoreEmployees=data?.employees.filter(employee=>teamFilter==='All'||canonicalTeam(employee.team)===teamFilter)||[];
     useEffect(()=>
     {
         api('/api/employees').then(result=>
@@ -58,12 +66,13 @@ export default function Dashboard(){
                 </div>
             </div>
             <div className="panel">
-                <h2>Employee monthly scores</h2>
+                <div className="pagehead chart-heading"><h2>Employee monthly scores</h2><label>Team<select value={teamFilter} onChange={e=>setTeamFilter(e.target.value)}><option>All</option><option>HLB Jim Roberts</option><option>Jim Roberts Consulting</option></select></label></div>
+                {scoreEmployees.length===0?<p>No employee scores for this team in the selected month.</p>:
                 <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={data.employees}><CartesianGrid strokeDasharray="3 3"/>
+                    <BarChart data={scoreEmployees}><CartesianGrid strokeDasharray="3 3"/>
                     <XAxis dataKey="employee"/><YAxis/><Tooltip/>
                     <Bar dataKey="sum_actual" fill="#003b70"/></BarChart>
-                </ResponsiveContainer>
+                </ResponsiveContainer>}
             </div>
             <div className="panel">
                 <h2>Employee actual trend</h2>
