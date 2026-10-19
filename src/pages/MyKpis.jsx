@@ -30,7 +30,7 @@ export default function MyKpis(){
                             <span className="kpi-code">{row.kpi_code}</span>
                         </div>
                         <Status value={row.status}/></div>
-                    <div className="kpi-target"><span>Target</span><b>{row.target??'—'} {row.unit_notes||''}</b></div>
+                    <div className="kpi-target"><span>Assigned target (read only)</span><b>{row.target??'—'} {row.unit_notes||''}</b></div>
                     <div className="my-kpi-fields">
                         <label>Actual<input type="number" step="any" value={row.actual??''} disabled={!editable||isBusy} placeholder="Enter your result" onChange={e=>update(row.id,{actual:e.target.value})}/></label>
                         <label>Comment<textarea rows="3" value={row.employee_comments||''} disabled={!editable||isBusy} placeholder="Add context for your reviewer" onChange={e=>update(row.id,{employee_comments:e.target.value})}/></label>

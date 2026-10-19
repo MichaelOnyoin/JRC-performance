@@ -15,8 +15,8 @@ export default function Entries(){
         <div className="pagehead"><div><h1>KPI Entries</h1><p>Review employee submissions and their supporting documents.</p></div><div className="actions"><label>Month<input type="date" value={month} onChange={e=>setMonth(e.target.value)}/></label><label>Employee ID<input placeholder="All employees" value={employee} onChange={e=>setEmployee(e.target.value)}/></label><button onClick={load}>Load</button></div></div>
         {error&&<div className="error">{error}</div>}
         {role&&role!=='Admin'&&<div className="notice">Only an Admin can approve or reject submitted KPI entries.</div>}
-        <div className="panel tablewrap"><table><thead><tr><th>Entry ID</th><th>Employee ID</th><th>Employee name</th><th>KPI ID</th><th>Description</th><th>Actual</th><th>Employee comments</th><th>Proof document</th><th>Score</th><th>Status</th><th>Reviewer feedback</th><th>Review</th></tr></thead>
-            <tbody>{loading?<tr><td colSpan="12">Loading entries…</td></tr>:rows.map(row=><ReviewRow key={row.id} row={row} isAdmin={role==='Admin'} review={review} saveReviewerEdits={saveReviewerEdits} download={download}/>)}{!loading&&!rows.length&&<tr><td colSpan="12">Load entries for a month to review submissions.</td></tr>}</tbody>
+        <div className="panel tablewrap"><table><thead><tr><th>Entry ID</th><th>Employee ID</th><th>Employee name</th><th>KPI ID</th><th>Description</th><th>Target</th><th>Actual</th><th>Employee comments</th><th>Proof document</th><th>Score</th><th>Status</th><th>Reviewer feedback</th><th>Review</th></tr></thead>
+            <tbody>{loading?<tr><td colSpan="13">Loading entries…</td></tr>:rows.map(row=><ReviewRow key={row.id} row={row} isAdmin={role==='Admin'} review={review} saveReviewerEdits={saveReviewerEdits} download={download}/>)}{!loading&&!rows.length&&<tr><td colSpan="13">Load entries for a month to review submissions.</td></tr>}</tbody>
         </table></div>
     </section>
 }
@@ -28,7 +28,7 @@ function ReviewRow({row,isAdmin,review,saveReviewerEdits,download}){
     async function saveEdits(){setBusy(true);try{return await saveReviewerEdits(row,actual,employeeComments)}finally{setBusy(false)}}
     async function decide(status){setBusy(true);try{const edited=await saveReviewerEdits(row,actual,employeeComments);if(edited)await review({...row,...edited},status,comments)}finally{setBusy(false)}}
     return <tr>
-        <td>{row.id}</td><td>{row.employee_id}</td><td>{row.employee_name||'—'}</td><td>{row.kpi_id}</td><td className="entry-description">{row.kpi_name||'—'}</td>
+        <td>{row.id}</td><td>{row.employee_id}</td><td>{row.employee_name||'—'}</td><td>{row.kpi_id}</td><td className="entry-description">{row.kpi_name||'—'}</td><td>{row.target??'—'}</td>
         <td>{isAdmin&&submitted?<input className="review-actual-input" type="number" step="any" value={actual} onChange={e=>setActual(e.target.value)}/>:row.actual??'—'}</td>
         <td>{isAdmin&&submitted?<textarea className="review-comment-input" rows="2" value={employeeComments} onChange={e=>setEmployeeComments(e.target.value)} placeholder="Employee comments"/>:row.employee_comments||'—'}</td>
         <td className="entry-document-cell">{row.has_context?<><button className="secondary" type="button" onClick={()=>download(row)}>Download</button><small>{row.context_filename}</small></>:'—'}</td>
