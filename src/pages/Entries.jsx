@@ -1,18 +1,20 @@
 import{useEffect,useState}from'react';
 import{api,downloadFile}from'../api';
 import Status from'../components/Status';
+import ImportEntries from'../components/ImportEntries';
 
 const currentMonth=()=>{const now=new Date();return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`};
 export default function Entries(){
-    const[month,setMonth]=useState(currentMonth),[employee,setEmployee]=useState(''),[rows,setRows]=useState([]),[role,setRole]=useState(''),[error,setError]=useState(''),[loading,setLoading]=useState(false);
-    useEffect(()=>{api('/api/auth/me').then(user=>setRole(user.role)).catch(e=>setError(e.message))},[]);
+    const[month,setMonth]=useState(currentMonth),[employee,setEmployee]=useState(''),[employees,setEmployees]=useState([]),[rows,setRows]=useState([]),[role,setRole]=useState(''),[error,setError]=useState(''),[loading,setLoading]=useState(false);
+    useEffect(()=>{api('/api/auth/me').then(async user=>{setRole(user.role);if(user.role==='Admin')setEmployees(await api('/api/employees'))}).catch(e=>setError(e.message))},[]);
     async function load(){setLoading(true);setError('');try{let query=`?month=${month}`;if(employee)query+=`&employee_id=${employee}`;setRows(await api(`/api/entries${query}`))}catch(e){setError(e.message)}finally{setLoading(false)}}
     useEffect(()=>{if(role)load()},[role]);
     async function saveReviewerEdits(row,actual,employeeComments){setError('');try{const updated=await api(`/api/entries/${row.id}/review-edit`,{method:'PATCH',body:JSON.stringify({actual:actual===''?null:Number(actual),employee_comments:employeeComments||null})});setRows(old=>old.map(item=>item.id===updated.id?{...item,...updated}:item));return updated}catch(e){setError(e.message);return null}}
     async function review(row,status,comments){setError('');if(status==='Rejected'&&!comments.trim()){setError('Add reviewer feedback before rejecting an entry.');return null}try{const updated=await api(`/api/entries/${row.id}/review`,{method:'PATCH',body:JSON.stringify({status,supervisor_comments:comments.trim()||null})});setRows(old=>old.map(item=>item.id===updated.id?{...item,...updated}:item));return updated}catch(e){setError(e.message);return null}}
     async function download(row){try{await downloadFile(`/api/entries/${row.id}/context`,row.context_filename||'supporting-document')}catch(e){setError(e.message)}}
     return <section>
-        <div className="pagehead"><div><h1>KPI Entries</h1><p>Review employee submissions and their supporting documents.</p></div><div className="actions"><label>Month<input type="date" value={month} onChange={e=>setMonth(e.target.value)}/></label><label>Employee ID<input placeholder="All employees" value={employee} onChange={e=>setEmployee(e.target.value)}/></label><button onClick={load}>Load</button></div></div>
+        <div className="pagehead"><div><h1>KPI Entries</h1><p>Review employee submissions and their supporting documents.</p></div><div className="actions"><label>Month<input type="month" value={month.slice(0,7)} onChange={e=>e.target.value&&setMonth(`${e.target.value}-01`)}/></label><label>Employee{role==='Admin'?<select value={employee} onChange={e=>setEmployee(e.target.value)}><option value="">All employees</option>{employees.map(person=><option key={person.id} value={person.id}>{person.name} (ID {person.id})</option>)}</select>:<input placeholder="All employees" value={employee} onChange={e=>setEmployee(e.target.value)}/>}</label><button onClick={load}>Load</button></div></div>
+        {role==='Admin'&&<ImportEntries month={month} employeeId={employee} onImported={load}/>}
         {error&&<div className="error">{error}</div>}
         {role&&role!=='Admin'&&<div className="notice">Only an Admin can approve or reject submitted KPI entries.</div>}
         <div className="panel tablewrap"><table><thead><tr><th>Entry ID</th><th>Employee ID</th><th>Employee name</th><th>KPI ID</th><th>Description</th><th>Target</th><th>Actual</th><th>Employee comments</th><th>Proof document</th><th>Score</th><th>Status</th><th>Reviewer feedback</th><th>Review</th></tr></thead>
