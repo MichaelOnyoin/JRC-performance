@@ -22,7 +22,7 @@ export default function Login()
         }
     }return <div className="login">
         <form onSubmit={submit}>
-            <div className="brand dark">HLB <span>JIM ROBERTS</span></div>
+            <img className="auth-logo" src="/hlb-jim-roberts.png" alt="HLB Jim Roberts Advisory and Accounting"/>
             <h1>Performance Hub</h1>
             <p>Sign in to manage firm-wide performance.</p>
             {error&&<div className="error">{error}

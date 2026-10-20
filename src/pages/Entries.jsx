@@ -17,7 +17,7 @@ export default function Entries(){
         {role==='Admin'&&<ImportEntries month={month} employeeId={employee} onImported={load}/>}
         {error&&<div className="error">{error}</div>}
         {role&&role!=='Admin'&&<div className="notice">Only an Admin can approve or reject submitted KPI entries.</div>}
-        <div className="panel tablewrap"><table><thead><tr><th>Entry ID</th><th>Employee ID</th><th>Employee name</th><th>KPI ID</th><th>Description</th><th>Target</th><th>Actual</th><th>Employee comments</th><th>Proof document</th><th>Score</th><th>Status</th><th>Reviewer feedback</th><th>Review</th></tr></thead>
+        <div className="panel tablewrap entries-table-wrap"><table className="entries-table"><thead><tr><th>Entry ID</th><th>Employee ID</th><th>Employee name</th><th>KPI ID</th><th>Description</th><th>Target</th><th>Actual</th><th>Employee comments</th><th>Proof document</th><th>Score</th><th>Status</th><th>Reviewer feedback</th><th>Review</th></tr></thead>
             <tbody>{loading?<tr><td colSpan="13">Loading entries…</td></tr>:rows.map(row=><ReviewRow key={row.id} row={row} isAdmin={role==='Admin'} review={review} saveReviewerEdits={saveReviewerEdits} download={download}/>)}{!loading&&!rows.length&&<tr><td colSpan="13">Load entries for a month to review submissions.</td></tr>}</tbody>
         </table></div>
     </section>
