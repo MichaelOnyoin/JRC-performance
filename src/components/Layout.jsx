@@ -8,6 +8,7 @@ const navIcons={
     dashboard:<><path d="M4 19V5M4 19h16"/><path d="m7 15 4-4 3 2 5-6"/></>,
     entries:<><path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h4"/></>,
     employees:<><circle cx="9" cy="8" r="3"/><path d="M3 20c.4-3.1 2.4-5 6-5s5.6 1.9 6 5M16 5.5a3 3 0 0 1 0 5.8M17 15c2.3.7 3.6 2.3 4 5"/></>,
+    users:<><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c.4-3.1 2.4-5 6-5s5.6 1.9 6 5M15 15c3.5 0 5.5 1.7 6 5"/></>,
     admin:<><path d="M12 3 19 6v5c0 4.8-2.7 8-7 10-4.3-2-7-5.2-7-10V6z"/><path d="m9 12 2 2 4-4"/></>
 };
 
@@ -49,6 +50,7 @@ export default function Layout(){
                 {user?.role!=='Employee'&&<>
                     <SideLink to="/entries" icon="entries" onClick={closeMobile}>KPI Entries</SideLink>
                     <SideLink to="/employees" icon="employees" onClick={closeMobile}>Employees</SideLink>
+                    {user?.role==='Admin'&&<SideLink to="/users" icon="users" onClick={closeMobile}>Users</SideLink>}
                     {(user?.role==='Admin'||user?.role==='Partner')&&<SideLink to="/admin" icon="admin" onClick={closeMobile}>Administration</SideLink>}
                 </>}
             </aside>

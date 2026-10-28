@@ -48,7 +48,7 @@ export default function Employees()
                     <div className="panel tablewrap">
                         <table>
                             <thead>
-                            <tr><th>Name</th><th>Email</th><th>Team</th><th>Service line</th><th>Reviewer</th></tr>
+                            <tr><th>Name</th><th>Email</th><th>Company</th><th>Service line</th><th>Reviewer</th></tr>
                             </thead>
                             <tbody>
                                 {rows.map(x=>

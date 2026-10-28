@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {api}from'../api';
+import {api} from '../api';
 import {BarChart,Bar,LineChart,Line,XAxis,YAxis,Tooltip,ResponsiveContainer,CartesianGrid} from 'recharts';
 const canonicalTeam=team=>{
     const normalized=String(team||'').trim().toLowerCase().replace(/\s+/g,' ');
@@ -54,7 +54,7 @@ export default function Dashboard(){
             <div className="cards">
                 <div>
                     <b>{data.teams.length}</b>
-                    <span>Teams</span>
+                    <span>Companies</span>
                 </div>
                 <div>
                  <b>{data.employees.length}</b>
@@ -71,7 +71,8 @@ export default function Dashboard(){
                 <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={scoreEmployees}><CartesianGrid strokeDasharray="3 3"/>
                     <XAxis dataKey="employee"/><YAxis/><Tooltip/>
-                    <Bar dataKey="sum_actual" fill="#003b70"/></BarChart>
+                    {/* <Bar dataKey="sum_actual" fill="#003b70"/></BarChart> */}
+                    <Bar dataKey="total_score" fill="#003b70"/></BarChart>
                 </ResponsiveContainer>}
             </div>
             <div className="panel">
@@ -85,8 +86,11 @@ export default function Dashboard(){
                 </div>
                 {trend&&<ResponsiveContainer width="100%" height={300}>
                     <LineChart data={trend.points}><CartesianGrid strokeDasharray="3 3"/>
-                    <XAxis dataKey="month" tickFormatter={value=>new Date(`${value}T00:00:00`).toLocaleString(undefined,{month:'short'})}/><YAxis/><Tooltip labelFormatter={value=>new Date(`${value}T00:00:00`).toLocaleString(undefined,{month:'long',year:'numeric'})} formatter={value=>[value,'Actual sum']}/>
+                    <XAxis dataKey="month" tickFormatter={value=>new Date(`${value}T00:00:00`).toLocaleString(undefined,{month:'short'})}/><YAxis/>
+                    <Tooltip labelFormatter={value=>new Date(`${value}T00:00:00`).toLocaleString(undefined,{month:'long',year:'numeric'})} formatter={value=>[value,'Actual Sum']}/>
                     <Line type="linear" dataKey="sum_actual" stroke="#003b70" strokeWidth={3} dot={{r:4}}/></LineChart>
+                    {/* <Line type="linear" dataKey="total_scores" stroke="#003b70" strokeWidth={3} dot={{r:4}}/></LineChart> */}
+
                 </ResponsiveContainer>}
             </div>
             <div className="panel">
