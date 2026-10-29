@@ -76,7 +76,7 @@ export default function Dashboard(){
                 </ResponsiveContainer>}
             </div>
             <div className="panel">
-                <h2>Employee actual trend</h2>
+                <h2>Employee monthly performance</h2>
                 <div className="actions">
                     <label>Employee
                         <select value={employeeId} onChange={e=>setEmployeeId(e.target.value)}>
@@ -86,9 +86,9 @@ export default function Dashboard(){
                 </div>
                 {trend&&<ResponsiveContainer width="100%" height={300}>
                     <LineChart data={trend.points}><CartesianGrid strokeDasharray="3 3"/>
-                    <XAxis dataKey="month" tickFormatter={value=>new Date(`${value}T00:00:00`).toLocaleString(undefined,{month:'short'})}/><YAxis/>
-                    <Tooltip labelFormatter={value=>new Date(`${value}T00:00:00`).toLocaleString(undefined,{month:'long',year:'numeric'})} formatter={value=>[value,'Actual Sum']}/>
-                    <Line type="linear" dataKey="sum_actual" stroke="#003b70" strokeWidth={3} dot={{r:4}}/></LineChart>
+                    <XAxis dataKey="month" tickFormatter={value=>new Date(`${value}T00:00:00`).toLocaleString(undefined,{month:'short'})}/><YAxis domain={[0,100]} tickFormatter={value=>`${value}%`}/>
+                    <Tooltip labelFormatter={value=>new Date(`${value}T00:00:00`).toLocaleString(undefined,{month:'long',year:'numeric'})} formatter={value=>[`${Number(value).toFixed(1)}%`,'Performance']}/>
+                    <Line type="linear" dataKey="percentage_score" stroke="#003b70" strokeWidth={3} dot={{r:4}}/></LineChart>
                     {/* <Line type="linear" dataKey="total_scores" stroke="#003b70" strokeWidth={3} dot={{r:4}}/></LineChart> */}
 
                 </ResponsiveContainer>}
@@ -110,7 +110,7 @@ export default function Dashboard(){
                             <td>{x.employee}</td>
                             <td>{x.team}</td>
                             <td>{x.total_score.toFixed(3)}</td>
-                            <td>{x.sum_actual.toFixed(1)} %</td>
+                            <td>{x.percentage_score.toFixed(1)} %</td>
                         </tr>
                         )}
                     </tbody>

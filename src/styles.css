@@ -186,3 +186,8 @@ header.app-header{position:relative;z-index:50;height:78px;width:100%;display:fl
 .add-kpi-form button{justify-self:start}
 @media(max-width:900px){.add-kpi-form{grid-template-columns:repeat(2,minmax(140px,1fr))}}
 @media(max-width:560px){.add-kpi-form{grid-template-columns:1fr}}
+.danger{background:#c92a36;color:#fff;border:1px solid #c92a36}.danger:hover:not(:disabled){background:#a91f2a;box-shadow:0 4px 12px #c92a3628}.danger:disabled{opacity:.55}.small-action{padding:8px 12px;white-space:nowrap}.users-table{min-width:1100px}
+.icon-delete{display:inline-grid;place-items:center;width:34px;height:34px;padding:7px;border:1px solid #f0c8cc;border-radius:7px;background:#fff;color:#bd2632;cursor:pointer}
+.icon-delete svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.icon-delete:hover:not(:disabled){background:#fff0f1;border-color:#d98b92}
+.icon-delete:disabled{opacity:.45;cursor:not-allowed}
