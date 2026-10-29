@@ -5,13 +5,23 @@ import ImportEntries from'../components/ImportEntries';
 
 const currentMonth=()=>{const now=new Date();return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`};
 export default function MyKpis(){
-    const[month,setMonth]=useState(currentMonth),[rows,setRows]=useState([]),[error,setError]=useState(''),[loading,setLoading]=useState(false),[busy,setBusy]=useState(null);
+    const[month,setMonth]=useState(currentMonth),[rows,setRows]=useState([]),[error,setError]=useState(''),[message,setMessage]=useState(''),[loading,setLoading]=useState(false),[busy,setBusy]=useState(null),[bulkSubmitting,setBulkSubmitting]=useState(false);
     const totalScore=rows.reduce((total,row)=>total+(Number(row.final_score)||0),0);
+    const editableRows=rows.filter(row=>['Draft','Rejected'].includes(row.status));
+    const bulkReady=editableRows.length>0&&editableRows.every(row=>row.actual!==null&&row.actual!==undefined&&String(row.actual).trim()!=='');
     async function load(){setLoading(true);setError('');try{setRows(await api(`/api/my/entries?month=${month}`))}catch(e){setError(e.message)}finally{setLoading(false)}}
     useEffect(()=>{load()},[month]);
     function update(id,changes){setRows(old=>old.map(row=>row.id===id?{...row,...changes}:row))}
     async function save(row){setBusy(row.id);setError('');try{const updated=await api(`/api/entries/${row.id}`,{method:'PATCH',body:JSON.stringify({actual:row.actual===''?null:Number(row.actual),employee_comments:row.employee_comments||null})});update(row.id,updated)}catch(e){setError(e.message)}finally{setBusy(null)}}
     async function submit(row){setBusy(row.id);setError('');try{const saved=await api(`/api/entries/${row.id}`,{method:'PATCH',body:JSON.stringify({actual:Number(row.actual),employee_comments:row.employee_comments||null})});const updated=await api(`/api/entries/${row.id}/submit`,{method:'POST'});update(row.id,{...saved,...updated})}catch(e){setError(e.message)}finally{setBusy(null)}}
+    async function submitAll(){
+        if(!bulkReady){setError('Enter an actual for every draft or rejected KPI before submitting the month.');return}
+        setBulkSubmitting(true);setError('');setMessage('');
+        try{
+            const result=await api(`/api/my/entries/submit?month=${month}`,{method:'POST',body:JSON.stringify({entries:editableRows.map(row=>({entry_id:row.id,actual:Number(row.actual),employee_comments:row.employee_comments||null}))})});
+            await load();setMessage(`${result.submitted} KPI entries submitted for review.`);
+        }catch(e){setError(e.message)}finally{setBulkSubmitting(false)}
+    }
     async function attach(row,file){if(!file)return;setBusy(row.id);setError('');try{const form=new FormData();form.append('file',file);const result=await api(`/api/entries/${row.id}/context`,{method:'POST',body:form});update(row.id,result)}catch(e){setError(e.message)}finally{setBusy(null)}}
     async function download(row){try{await downloadFile(`/api/entries/${row.id}/context`,row.context_filename||'supporting-document')}catch(e){setError(e.message)}}
     async function removeAttachment(row){setBusy(row.id);setError('');try{await api(`/api/entries/${row.id}/context`,{method:'DELETE'});update(row.id,{has_context:false,context_filename:null})}catch(e){setError(e.message)}finally{setBusy(null)}}
@@ -20,7 +30,7 @@ export default function MyKpis(){
             <label className="month-picker">Reporting month<input type="month" value={month.slice(0,7)} onChange={e=>e.target.value&&setMonth(`${e.target.value}-01`)}/></label>
         </div>
         <ImportEntries month={month} onImported={load}/>
-        {error&&<div className="error">{error}</div>}
+        {error&&<div className="error">{error}</div>}{message&&<div className="notice">{message}</div>}
         {loading?<div className="panel">Loading your KPIs…</div>:rows.length===0?<div className="panel empty-state"><h2>No generated KPIs for this month</h2><p>Choose another month or ask your administrator to generate the monthly KPI entries.</p></div>:
             <div className="my-kpi-list">{rows.map(row=>{
                 const editable=['Draft','Rejected'].includes(row.status),isBusy=busy===row.id;
@@ -34,12 +44,12 @@ export default function MyKpis(){
                         <Status value={row.status}/></div>
                     <div className="kpi-target"><span>Assigned target (read only)</span><b>{row.target??'—'} {row.unit_notes||''}</b></div>
                     <div className="my-kpi-fields">
-                        <label>Actual<input type="number" step="any" value={row.actual??''} disabled={!editable||isBusy} placeholder="Enter your result" onChange={e=>update(row.id,{actual:e.target.value})}/></label>
-                        <label>Comment<textarea rows="3" value={row.employee_comments||''} disabled={!editable||isBusy} placeholder="Add context for your reviewer" onChange={e=>update(row.id,{employee_comments:e.target.value})}/></label>
+                        <label>Actual<input type="number" step="any" value={row.actual??''} disabled={!editable||isBusy||bulkSubmitting} placeholder="Enter your result" onChange={e=>update(row.id,{actual:e.target.value})}/></label>
+                        <label>Comment<textarea rows="3" value={row.employee_comments||''} disabled={!editable||isBusy||bulkSubmitting} placeholder="Add context for your reviewer" onChange={e=>update(row.id,{employee_comments:e.target.value})}/></label>
                     </div>
                     <div className="kpi-attachment"><div><b>Proof document</b><p>{row.has_context?row.context_filename:'Attach a supporting document (10 MB maximum).'}</p></div><div className="actions">
-                        {row.has_context&&<><button className="secondary" type="button" onClick={()=>download(row)}>Download</button>{editable&&<button type="button" disabled={isBusy} onClick={()=>removeAttachment(row)}>Remove</button>}</>}
-                        {editable&&<label className="file-picker"><span>{row.has_context?'Replace document':'Choose document'}</span><input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.png,.jpg,.jpeg" disabled={isBusy} onChange={e=>{attach(row,e.target.files?.[0]);e.target.value=''}}/></label>}
+                        {row.has_context&&<><button className="secondary" type="button" disabled={bulkSubmitting} onClick={()=>download(row)}>Download</button>{editable&&<button type="button" disabled={isBusy||bulkSubmitting} onClick={()=>removeAttachment(row)}>Remove</button>}</>}
+                        {editable&&<label className="file-picker"><span>{row.has_context?'Replace document':'Choose document'}</span><input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.png,.jpg,.jpeg" disabled={isBusy||bulkSubmitting} onChange={e=>{attach(row,e.target.files?.[0]);e.target.value=''}}/></label>}
                     </div></div>
                     <div className="my-kpi-footer">
                         <div className="kpi-score">
@@ -48,12 +58,13 @@ export default function MyKpis(){
                              <>Calculated score: 
                              <b>{Number(row.final_score).toFixed(2)}</b> · {Number(row.performance_pct||0).toFixed(1)}% of target</>:
                              <>Score is calculated when you save an actual.</>}</div>
-                        {editable&&<div className="actions"><button className="secondary" disabled={isBusy} onClick={()=>save(row)}>{isBusy?'Saving…':'Save draft'}</button><button disabled={isBusy||row.actual===''||row.actual==null} onClick={()=>submit(row)}>Submit for review</button></div>}
+                        {editable&&<div className="actions"><button className="secondary" disabled={isBusy||bulkSubmitting} onClick={()=>save(row)}>{isBusy?'Saving…':'Save draft'}</button><button disabled={isBusy||bulkSubmitting||row.actual===''||row.actual==null} onClick={()=>submit(row)}>Submit for review</button></div>}
                     </div>
                     {row.status==='Rejected'&&row.supervisor_comments&&<div className="review-note"><b>Reviewer feedback</b><p>{row.supervisor_comments}</p></div>}
                 </article>
             })}</div>
         }
+        {!loading&&rows.length>0&&<div className="my-kpi-bulk-submit"><div><b>Submit all KPI entries for this month</b><p>{editableRows.length?`${editableRows.length} draft or rejected entries will be sent to your reviewer together.`:'There are no draft or rejected entries to submit.'}</p>{editableRows.length>0&&!bulkReady&&<small>Enter an actual for every editable KPI to enable submission.</small>}</div><button disabled={!bulkReady||bulkSubmitting||busy!==null} onClick={submitAll}>{bulkSubmitting?'Submitting…':`Submit all ${editableRows.length} for review`}</button></div>}
         {!loading&&rows.length>0&&<div className="monthly-score-total"><span>Sum of scores for this month</span><b>{totalScore.toFixed(2)}</b></div>}
     </section>
 }

@@ -39,6 +39,14 @@ export async function signup(full_name,email,password)
     if(!res.ok){let detail='Could not create account';try{detail=(await res.json()).detail||detail}catch{}throw new Error(detail)}
     return res.json()
 }
+export async function requestPasswordReset(email)
+{
+    return api('/api/auth/forgot-password',{method:'POST',body:JSON.stringify({email})})
+}
+export async function resetPassword(token,new_password)
+{
+    return api('/api/auth/reset-password',{method:'POST',body:JSON.stringify({token,new_password})})
+}
 export async function downloadFile(path,filename='supporting-document')
 {
     const token=localStorage.getItem('token');

@@ -30,6 +30,7 @@ export default function Login()
             }
             <label>Email<input value={email} onChange={e=>setEmail(e.target.value)} type="email" required/></label>
             <label>Password<input value={password} onChange={e=>setPassword(e.target.value)} type="password" required/></label>
+            <p className="auth-switch"><a href="/forgot-password">Forgot your password?</a></p>
             <button>Sign in</button>
             <p className="auth-switch">New employee? <a href="/signup">Create an account</a></p>
         </form>
