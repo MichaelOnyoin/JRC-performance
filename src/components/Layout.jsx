@@ -36,7 +36,7 @@ export default function Layout(){
             <button className="nav-toggle" onClick={toggleSidebar} aria-label={mobileOpen?'Close navigation':'Toggle navigation'} aria-expanded={window.matchMedia('(max-width: 820px)').matches?mobileOpen:!collapsed} title="Toggle navigation">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
             </button>
-            <img className="brand-logo" src="/hlb-jim-roberts.png" alt="HLB Jim Roberts Advisory and Accounting"/>
+            <img className="brand-logo" src="/jrc-logo-horizontal.png" alt="Jim Roberts Consulting"/>
             <div className="header-spacer"/>
             {user?.full_name&&<span className="header-user">{user.full_name}</span>}
             <button className="signout-button" onClick={()=>{localStorage.clear();nav('/login')}}>Sign out</button>

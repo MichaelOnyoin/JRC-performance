@@ -10,7 +10,7 @@ export default function ForgotPassword(){
         catch(e){setError(e.message)}finally{setSending(false)}
     }
     return <div className="login"><form onSubmit={submit}>
-        <img className="auth-logo" src="/hlb-jim-roberts.png" alt="HLB Jim Roberts Advisory and Accounting"/>
+        <img className="auth-logo" src="/jrc-logo-horizontal.png" alt="Jim Roberts Consulting"/>
         <h1>Forgot password?</h1>
         <p>Enter your registered work email and we’ll send a password reset link if an active account exists.</p>
         {error&&<div className="error">{error}</div>}{message&&<div className="notice">{message}</div>}

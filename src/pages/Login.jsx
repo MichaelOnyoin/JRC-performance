@@ -15,14 +15,14 @@ export default function Login()
         {
             const x=await login(email,password);
             localStorage.setItem('token',x.access_token);
-            const me=await (await fetch(`${import.meta.env.VITE_API_URL||'http://127.0.0.1:8000'}/api/auth/me`,{headers:{Authorization:`Bearer ${x.access_token}`} })).json();
+            const me=await (await fetch(`${import.meta.env.API_URL||'http://127.0.0.1:8000'}/api/auth/me`,{headers:{Authorization:`Bearer ${x.access_token}`} })).json();
             nav(me.role==='Employee'?'/profile':'/dashboard')
         }catch(e){
             setError(e.message)
         }
     }return <div className="login">
         <form onSubmit={submit}>
-            <img className="auth-logo" src="/hlb-jim-roberts.png" alt="HLB Jim Roberts Advisory and Accounting"/>
+            <img className="auth-logo" src="/jrc-logo-horizontal.png" alt="Jim Roberts Consulting"/>
             <h1>Performance Hub</h1>
             <p>Sign in to manage firm-wide performance.</p>
             {error&&<div className="error">{error}

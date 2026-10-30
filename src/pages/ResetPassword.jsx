@@ -12,7 +12,7 @@ export default function ResetPassword(){
         catch(e){setError(e.message)}finally{setSaving(false)}
     }
     return <div className="login"><form onSubmit={submit}>
-        <img className="auth-logo" src="/hlb-jim-roberts.png" alt="HLB Jim Roberts Advisory and Accounting"/>
+        <img className="auth-logo" src="/jrc-logo-horizontal.png" alt="Jim Roberts Consulting"/>
         <h1>Set a new password</h1>
         {!token?<div className="error">This reset link is missing its token. Request a new link below.</div>:<>
             <p>Choose a new password with at least 8 characters.</p>
