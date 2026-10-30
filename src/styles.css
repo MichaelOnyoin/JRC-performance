@@ -123,7 +123,7 @@
     flex-direction:column
   }
 
-  .kpi-attachment .actions{flex-wrap:wrap}.compact-file-picker{margin:5px 0 0}}
+.kpi-attachment .actions{flex-wrap:wrap}.compact-file-picker{margin:5px 0 0}}
 .review-comment-input{min-width:190px;width:100%;border:1px solid #b6c6d6;border-radius:5px;padding:8px;font:inherit;color:#17324d;resize:vertical}.review-actions{display:flex;gap:6px;align-items:center}.review-actions button{white-space:nowrap}.entry-description{min-width:240px;max-width:420px;white-space:normal}.review-actions button.secondary{background:#526b82}
 .review-actions-stacked{align-items:stretch;flex-direction:column;min-width:118px}.review-actual-input{width:100px;min-width:85px;border:1px solid #b6c6d6;border-radius:5px;padding:8px;color:#17324d}
 .monthly-score-total{display:flex;justify-content:space-between;align-items:center;gap:16px;margin:20px 0 0;padding:20px 24px;background:var(--blue);color:#fff;border-radius:8px;box-shadow:0 5px 16px #003b7020}.monthly-score-total span{font-size:16px;font-weight:700}.monthly-score-total b{font-size:28px}
